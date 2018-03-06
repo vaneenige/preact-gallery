@@ -1,0 +1,21 @@
+.list-container {
+  height: calc(100% - 56px);
+  overflow-y: auto;
+  position: relative;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  position: relative;
+  padding-top: 20px;
+}
