@@ -4,7 +4,7 @@ const polka = require('polka');
 const MongoClient = require('mongodb').MongoClient;
 
 const middleware = require('unvault-middleware');
-const compression = require('compression');
+const shrinkRay = require('shrink-ray');
 const serveStatic = require('serve-static');
 
 const routes = require('./routes');
@@ -48,7 +48,7 @@ async function initialize() {
       },
     })
   );
-  server.use(compression({ threshold: false }));
+  server.use(shrinkRay({ threshold: false, brotli: { quality: 11 } }));
   server.use((req, res, next) => {
     if (req.originalUrl === '/') track(req.headers['user-agent'], 'views');
     next();

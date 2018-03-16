@@ -1,13 +1,16 @@
 const gzip = require('gzip-size');
+const brotli = require('brotli-size');
 
 const store = require('./utils/store');
 
 const config = require('./config');
 
-async function getFiles() {
-  const css = await gzip(store.get('css'));
-  const js = await gzip(store.get('js'));
-  const html = (await gzip(store.get('html'))) - css - js;
+const size = { uncompressed: str => Buffer.byteLength(str, 'utf8'), gzip, brotli: brotli.sync };
+
+async function getFileSizes(type) {
+  const css = await size[type](store.get('css'));
+  const js = await size[type](store.get('js'));
+  const html = (await size[type](store.get('html'))) - css - js;
   const total = html + css + js;
 
   return {
@@ -24,7 +27,10 @@ async function getAnalytics() {
     .find()
     .count();
 
-  const images = (await store.get('db-images').distinct('url')).length;
+  const images = await store
+    .get('db-images')
+    .find()
+    .count();
 
   const bytes = (await store
     .get('db-images')
@@ -43,7 +49,11 @@ async function stats() {
   return JSON.stringify(
     {
       analytics: config.track ? await getAnalytics() : null,
-      files: await getFiles(),
+      files: {
+        uncompressed: await getFileSizes('uncompressed'),
+        gzip: await getFileSizes('gzip'),
+        brotli: await getFileSizes('brotli'),
+      },
     },
     null,
     2
